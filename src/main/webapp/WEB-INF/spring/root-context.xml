@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context = "http://www.springframework.org/schema/context"
+	xmlns:mvc = "http://www.springframework.org/schema/mvc"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:task= "http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+    http://www.springframework.org/schema/data/mongo
+    http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task-3.1.xsd
+    ">
+	
+	<!-- Annotations -->	
+	<mvc:annotation-driven />
+	<context:annotation-config />
+	
+	<!-- Mongo -->
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongo" ref="mongo"/>
+        <constructor-arg name="databaseName" value="Werewolf"/>
+        <constructor-arg name="userCredentials" ref="mongoCredentials"/>
+    </bean>
+
+    <bean id="mongoCredentials" class="org.springframework.data.authentication.UserCredentials">
+        <constructor-arg name="username" value="admin" />
+        <constructor-arg name="password" value="werewolf123" />
+    </bean>
+
+    <bean class="com.mongodb.MongoURI" id="mongoURI">
+        <constructor-arg value="mongodb://admin:werewolf123@paulo.mongohq.com:10057/Werewolf"  />
+    </bean>
+
+    <bean class="com.mongodb.Mongo" id="mongo">
+        <constructor-arg ref="mongoURI" />
+    </bean>
+	
+	<!-- Timing -->
+	<task:annotation-driven executor="myExecutor" scheduler="myScheduler"/>
+	<task:executor id="myExecutor" pool-size="5"/>
+	<task:scheduler id="myScheduler" pool-size="10"/>
+	
+	
+	<!-- Beans -->
+	<bean id="casualtyDAO" class="edu.wm.werewolf.dao.MongoCasualtyDAO" />
+	<bean id="gameDAO" class="edu.wm.werewolf.dao.MongoGameDAO" />
+	<bean id="playerDAO" class="edu.wm.werewolf.dao.MongoPlayerDAO" />
+	<bean id="userDAO" class="edu.wm.werewolf.dao.MongoUserDAO" />
+	<bean id="scoreConfigDAO" class = "edu.wm.werewolf.dao.PropertiesScoreConfigDAO" />
+	<bean id="gameService" class="edu.wm.werewolf.service.GameService" />
+	<bean id="userService" class="edu.wm.werewolf.service.UserService" />
+	<bean id="securityService" class="edu.wm.werewolf.service.SecurityService" />
+	<bean id="basicPlayerFactory" class="edu.wm.werewolf.util.BasicPlayerFactory" />
+	<bean id="scoreConfig" class="edu.wm.werewolf.util.ScoreConfig" >
+		<constructor-arg value="scoreConfig.properties" />
+	</bean>
+		
+</beans>
